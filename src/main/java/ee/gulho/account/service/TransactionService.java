@@ -37,7 +37,7 @@ public class TransactionService {
     public Transaction createTransaction(TransactionCreateRequest request) {
         UUID transactionId = UUID.randomUUID();
 
-        Account account = accountService.getAccountById(request.getAccountId().toString());
+        Account account = accountService.getAccountById(request.accountId().toString());
         Balance balance = getBalanceForTransactionCurrency(request, account);
         validator.validate(request, balance);
 
@@ -79,15 +79,15 @@ public class TransactionService {
     }
 
     private BigDecimal doTransaction(TransactionCreateRequest transactionCreate, UUID transactionId, Account account, Balance balance) {
-        var newBalance = calculateNewAmount(balance.getAmount(), transactionCreate.getAmount(), transactionCreate.getDirection());
+        var newBalance = calculateNewAmount(balance.getAmount(), transactionCreate.amount(), transactionCreate.direction());
         balanceRepository.updateBalanceAmount(newBalance, balance.getId(), MDC.get(sessionId));
         transactionRepository.createTransaction(
                 transactionId,
                 account.getId(),
-                transactionCreate.getCurrency(),
-                transactionCreate.getAmount(),
-                transactionCreate.getDirection().toString(),
-                transactionCreate.getDescription(),
+                transactionCreate.currency(),
+                transactionCreate.amount(),
+                transactionCreate.direction().toString(),
+                transactionCreate.description(),
                 MDC.get(sessionId)
         );
         return newBalance;
@@ -95,12 +95,12 @@ public class TransactionService {
 
     private Transaction createResponse(TransactionCreateRequest transactionCreate, UUID transactionId, BigDecimal newBalanceAmount) {
         return Transaction.builder()
-                .accountId(transactionCreate.getAccountId())
+                .accountId(transactionCreate.accountId())
                 .transactionId(transactionId)
-                .amount(transactionCreate.getAmount())
-                .currency(transactionCreate.getCurrency())
-                .direction(transactionCreate.getDirection().toString())
-                .description(transactionCreate.getDescription())
+                .amount(transactionCreate.amount())
+                .currency(transactionCreate.currency())
+                .direction(transactionCreate.direction().toString())
+                .description(transactionCreate.description())
                 .balanceAmount(newBalanceAmount)
                 .build();
     }
@@ -115,7 +115,7 @@ public class TransactionService {
 
     private Balance getBalanceForTransactionCurrency(TransactionCreateRequest request, Account account) {
         var optionalBalance = account.getBalances().stream()
-                .filter(balance -> balance.getCurrency().equals(request.getCurrency()))
+                .filter(balance -> balance.getCurrency().equals(request.currency()))
                 .findFirst();
         return optionalBalance.orElseThrow(() ->
                 new TransactionCreateError("Account does not have a balance for the current currency"));

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class TransactionValidation {
 
     public void validate(TransactionCreateRequest request, Balance balance) {
-        if (request.getDirection().equals(TransactionDirection.OUT) && balance.getAmount().compareTo(request.getAmount()) < 0) {
+        if (request.direction().equals(TransactionDirection.OUT) && balance.getAmount().compareTo(request.amount()) < 0) {
             throw new TransactionCreateError("Account balance amount is less that in transaction");
         }
     }

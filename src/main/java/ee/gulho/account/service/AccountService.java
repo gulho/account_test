@@ -30,8 +30,8 @@ public class AccountService {
     @Transactional
     public Account createAccount(AccountCreateRequest request) {
         var uid = UUID.randomUUID();
-        accountRepository.insertAccount(uid, request.getCustomerId(), MDC.get(sessionId));
-        request.getCurrencies()
+        accountRepository.insertAccount(uid, request.customerId(), MDC.get(sessionId));
+        request.currencies()
                 .forEach(currency -> createNewBalance(currency, uid));
 
         return getAccountById(uid.toString());
