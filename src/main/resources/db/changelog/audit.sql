@@ -32,7 +32,7 @@ $BODY$
 
 create table audit_balance
 (
-    id serial primary key,
+    id integer,
     amount     money   not null,
     currency   varchar not null,
     account_id uuid    not null,

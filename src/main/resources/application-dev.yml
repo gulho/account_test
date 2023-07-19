@@ -1,8 +1,7 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/account
+    url: jdbc:postgresql://localhost:5432/account
     username: user
     password: password
-
 mybatis:
   type-handlers-package: ee.gulho.account.configuration.typehandler

@@ -6,10 +6,9 @@ services:
       POSTGRES_PASSWORD: "password"
       POSTGRES_USER: "user"
       POSTGRES_DB: "account"
-    ports:
-      - "5432:5432"
-#  rabbitmq:
-#    image: "rabbitmq:3-management"
 #    ports:
-#      - "5672:5672"
-#      - "15672:15672"
+#      - "5432:5432"
+  service:
+    image: "account:1.0.0"
+    ports:
+      - "8080:8080"
