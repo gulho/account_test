@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account
+    username: user
+    password: password
+  rabbitmq:
+    host: localhost
+    port: 5672
+mybatis:
+  type-handlers-package: ee.gulho.account.configuration.typehandler
+#  mapper-locations: classpath*:**/mapper/*Mapper.xml
