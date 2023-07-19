@@ -47,6 +47,22 @@ class TransactionTestIT {
     }
 
     @Test
+    void createInternalTransaction_success() throws Exception {
+        mockMvc.perform(post(TRANSACTION_PATH + "internal")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "accountOut": "df604273-4286-4b05-afa8-820860f9dbc5",
+                          "accountIn": "378a0210-fa56-11ed-be56-0242ac120002",
+                          "currency": "USD",
+                          "amount": 5,
+                          "description": "internal transaction"
+                        }
+                        """))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void getTransaction_success() throws Exception {
         mockMvc.perform(get(TRANSACTION_PATH + TRANSACTION_ID))
                 .andExpect(status().isOk());

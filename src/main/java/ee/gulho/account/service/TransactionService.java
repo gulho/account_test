@@ -8,6 +8,7 @@ import ee.gulho.account.exception.AccountNotFoundException;
 import ee.gulho.account.exception.TransactionCreateError;
 import ee.gulho.account.mapper.BalanceRepository;
 import ee.gulho.account.mapper.TransactionRepository;
+import ee.gulho.account.service.dto.InternalTransactionCreateRequest;
 import ee.gulho.account.service.dto.TransactionCreateRequest;
 import ee.gulho.account.utils.TransactionValidation;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -36,9 +38,28 @@ public class TransactionService {
 
         BigDecimal newBalanceAmount = doTransaction(request, transactionId, account, balance);
 
-        Transaction response = createResponse(request, transactionId, newBalanceAmount);
+        return createResponse(request, transactionId, newBalanceAmount);
+    }
 
-        return response;
+    @Transactional()
+    public Set<Transaction> createInternalTransaction(InternalTransactionCreateRequest internalTransaction) {
+        var transactionIn = TransactionCreateRequest.builder()
+                .accountId(internalTransaction.accountIn())
+                .currency(internalTransaction.currency())
+                .amount(internalTransaction.amount())
+                .direction(TransactionDirection.IN)
+                .description(internalTransaction.description())
+                .build();
+        var transactionOut = TransactionCreateRequest.builder()
+                .accountId(internalTransaction.accountOut())
+                .currency(internalTransaction.currency())
+                .amount(internalTransaction.amount())
+                .direction(TransactionDirection.OUT)
+                .description(internalTransaction.description())
+                .build();
+        var inTransactionValue = createTransaction(transactionIn);
+        var outTransactionValue = createTransaction(transactionOut);
+        return Set.of(inTransactionValue, outTransactionValue);
     }
 
     public Transaction getTransaction(String transactionId) {

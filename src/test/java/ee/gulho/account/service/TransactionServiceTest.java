@@ -8,6 +8,7 @@ import ee.gulho.account.exception.AccountNotFoundException;
 import ee.gulho.account.exception.TransactionCreateError;
 import ee.gulho.account.mapper.BalanceRepository;
 import ee.gulho.account.mapper.TransactionRepository;
+import ee.gulho.account.service.dto.InternalTransactionCreateRequest;
 import ee.gulho.account.service.dto.TransactionCreateRequest;
 import ee.gulho.account.utils.TransactionValidation;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 class TransactionServiceTest {
 
     private static final UUID ACCOUNT_ID = UUID.randomUUID();
+    private static final UUID ACCOUNT_ID_OUT = UUID.randomUUID();
     private static final BigDecimal AMOUNT = BigDecimal.TEN;
     private static final String CURRENCY = "USD";
     private static final TransactionDirection DIRECTION = TransactionDirection.IN;
@@ -74,6 +76,34 @@ class TransactionServiceTest {
                 .isInstanceOf(Transaction.class)
                 .extracting("accountId")
                 .isEqualTo(ACCOUNT_ID);
+    }
+
+    @Test
+    void createInternalTransaction_success() {
+        var request = InternalTransactionCreateRequest.builder()
+                .accountIn(ACCOUNT_ID)
+                .accountOut(ACCOUNT_ID_OUT)
+                .amount(AMOUNT)
+                .currency(CURRENCY)
+                .description(DESCRIPTION)
+                .build();
+        var balance = Balance.builder()
+                .id(10)
+                .currency(CURRENCY)
+                .amount(AMOUNT)
+                .build();
+        var account = Account.builder()
+                .id(UUID.randomUUID())
+                .customerId(UUID.randomUUID())
+                .balances(List.of(balance))
+                .build();
+        when(accountService.getAccountById((String) any())).thenReturn(account);
+
+        var transactions = service.createInternalTransaction(request);
+
+        assertThat(transactions).isNotNull()
+                .extracting(s -> s.getAccountId())
+                .contains(ACCOUNT_ID, ACCOUNT_ID_OUT);
     }
 
     @Test

@@ -19,6 +19,7 @@ public class TransactionCreateRequest {
     private UUID accountId;
     @Positive
     private BigDecimal amount;
+    @NotEmpty
     private String currency;
     private TransactionDirection direction;
     @NotEmpty
