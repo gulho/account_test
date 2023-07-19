@@ -3,5 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/account
     username: user
     password: password
+app:
+  sessionId: "session_id"
 mybatis:
   type-handlers-package: ee.gulho.account.configuration.typehandler

@@ -12,9 +12,9 @@ import java.util.UUID;
 @Mapper
 public interface BalanceRepository {
 
-    @Insert("insert into balance (amount, currency, account_id) VALUES (#{amount}, #{currency}, #{account})")
-    Long insertBalance(BigDecimal amount, String currency, UUID account);
+    @Insert("insert into balance (amount, currency, account_id, created_session_id) VALUES (#{amount}, #{currency}, #{account}, #{sessionId})")
+    Long insertBalance(BigDecimal amount, String currency, UUID account, String sessionId);
 
-    @Update("update balance set amount = #{amount} where id = #{id}")
-    void updateBalanceAmount(BigDecimal amount, Integer id);
+    @Update("update balance set amount = #{amount}, created_session_id = #{sessionId} where id = #{id}")
+    void updateBalanceAmount(BigDecimal amount, Integer id, String sessionId);
 }

@@ -3,7 +3,8 @@ create table account
     id          uuid not null
         constraint account_pk
             primary key,
-    customer_id uuid not null
+    customer_id uuid not null,
+    created_session_id text
 );
 
 create table balance
@@ -13,7 +14,8 @@ create table balance
     currency   varchar not null,
     account_id uuid    not null
         constraint balance_account_id_fk
-            references account
+            references account,
+    created_session_id text
 );
 
 create table transaction
@@ -26,5 +28,6 @@ create table transaction
     currency    varchar not null,
     amount      money   not null,
     direction   varchar not null,
-    description text    not null
+    description text    not null,
+    created_session_id text
 )

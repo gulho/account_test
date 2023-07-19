@@ -12,6 +12,8 @@ import ee.gulho.account.service.dto.InternalTransactionCreateRequest;
 import ee.gulho.account.service.dto.TransactionCreateRequest;
 import ee.gulho.account.utils.TransactionValidation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
+
+    @Value("${app.sessionId:session_id}")
+    public String sessionId;
 
     private final TransactionValidation validator;
     private final AccountService accountService;
@@ -43,6 +48,7 @@ public class TransactionService {
 
     @Transactional()
     public Set<Transaction> createInternalTransaction(InternalTransactionCreateRequest internalTransaction) {
+
         var transactionIn = TransactionCreateRequest.builder()
                 .accountId(internalTransaction.accountIn())
                 .currency(internalTransaction.currency())
@@ -74,14 +80,15 @@ public class TransactionService {
 
     private BigDecimal doTransaction(TransactionCreateRequest transactionCreate, UUID transactionId, Account account, Balance balance) {
         var newBalance = calculateNewAmount(balance.getAmount(), transactionCreate.getAmount(), transactionCreate.getDirection());
-        balanceRepository.updateBalanceAmount(newBalance, balance.getId());
+        balanceRepository.updateBalanceAmount(newBalance, balance.getId(), MDC.get(sessionId));
         transactionRepository.createTransaction(
                 transactionId,
                 account.getId(),
                 transactionCreate.getCurrency(),
                 transactionCreate.getAmount(),
                 transactionCreate.getDirection().toString(),
-                transactionCreate.getDescription()
+                transactionCreate.getDescription(),
+                MDC.get(sessionId)
         );
         return newBalance;
     }

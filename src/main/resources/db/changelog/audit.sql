@@ -30,12 +30,22 @@ END;
 $BODY$
     LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
+create table audit_account
+(
+    id          uuid not null,
+    customer_id uuid not null,
+    created_session_id text,
+    timestamp timestamp with time zone,
+    operation varchar
+);
+
 create table audit_balance
 (
     id integer,
     amount     money   not null,
     currency   varchar not null,
     account_id uuid    not null,
+    created_session_id text,
     timestamp timestamp with time zone,
     operation varchar
 );
@@ -44,5 +54,12 @@ DROP TRIGGER IF exists tr_log_table ON balance;
 CREATE TRIGGER tr_audit_table
     BEFORE UPDATE OR DELETE OR INSERT
     ON balance
+    FOR EACH ROW
+EXECUTE PROCEDURE tf_audit_table();
+
+DROP TRIGGER IF exists tr_log_table ON account;
+CREATE TRIGGER tr_audit_table
+    BEFORE UPDATE OR DELETE OR INSERT
+    ON account
     FOR EACH ROW
 EXECUTE PROCEDURE tf_audit_table();

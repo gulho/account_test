@@ -6,6 +6,8 @@ import ee.gulho.account.mapper.AccountRepository;
 import ee.gulho.account.mapper.BalanceRepository;
 import ee.gulho.account.service.dto.AccountCreateRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountService {
 
+    @Value("${app.sessionId:session_id}")
+    public String sessionId;
+
     private final AccountRepository accountRepository;
     private final BalanceRepository balanceRepository;
 
@@ -25,13 +30,11 @@ public class AccountService {
     @Transactional
     public Account createAccount(AccountCreateRequest request) {
         var uid = UUID.randomUUID();
-        accountRepository.insertAccount(uid, request.getCustomerId());
+        accountRepository.insertAccount(uid, request.getCustomerId(), MDC.get(sessionId));
         request.getCurrencies()
                 .forEach(currency -> createNewBalance(currency, uid));
 
-        var createdAccount = getAccountById(uid.toString());
-
-        return createdAccount;
+        return getAccountById(uid.toString());
     }
 
     public Account getAccountById(String id) {
@@ -48,6 +51,6 @@ public class AccountService {
     }
 
     private void createNewBalance(String currency, UUID accountId) {
-        balanceRepository.insertBalance(balanceCreatedAmount, currency, accountId);
+        balanceRepository.insertBalance(balanceCreatedAmount, currency, accountId, MDC.get(sessionId));
     }
 }

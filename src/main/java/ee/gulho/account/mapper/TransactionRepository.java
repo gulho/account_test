@@ -3,7 +3,6 @@ package ee.gulho.account.mapper;
 import ee.gulho.account.entity.Transaction;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
-
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,10 +10,10 @@ import java.util.UUID;
 @Repository
 @Mapper
 public interface TransactionRepository {
-
-    @Insert("insert into transaction (id, account_id, currency, amount, direction, description) " +
-            "VALUES (#{id}, #{accountId}, #{currency}, #{amount}, #{direction}, #{description})")
-    void createTransaction(UUID id, UUID accountId, String currency, BigDecimal amount, String direction, String description);
+    @Insert("insert into transaction (id, account_id, currency, amount, direction, description, created_session_id) " +
+            "VALUES (#{id}, #{accountId}, #{currency}, #{amount}, #{direction}, #{description}, #{sessionId})")
+    @Options
+    void createTransaction(UUID id, UUID accountId, String currency, BigDecimal amount, String direction, String description, String sessionId);
 
     @Select("select * from transaction where id = #{id}")
     @Results(value = {

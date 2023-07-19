@@ -32,7 +32,7 @@ public interface AccountRepository {
     @Select("select id, amount::numeric, currency, account_id from balance where account_id=#{account_id}")
     List<Balance> getAllBalancesByAccount();
 
-    @Insert("insert into account (id, customer_id) values (#{id}, #{customerId})")
-    void insertAccount(UUID id, UUID customerId);
+    @Insert("insert into account (id, customer_id, created_session_id) values (#{id}, #{customerId}, #{sessionId})")
+    void insertAccount(UUID id, UUID customerId, String sessionId);
 
 }
