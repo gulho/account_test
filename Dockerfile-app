@@ -1,0 +1,16 @@
+FROM gradle:jdk17 as build
+WORKDIR /workspace/app
+
+COPY src src
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY gradle gradle
+
+RUN gradle build -x test
+
+FROM openjdk
+
+ENV ARTIFACT_NAME=account-1.0.0.jar
+ARG DEPENDENCY=/workspace/app/build/libs
+COPY --from=build $DEPENDENCY/$ARTIFACT_NAME /app/$ARTIFACT_NAME
+ENTRYPOINT exec java -jar /app/$ARTIFACT_NAME

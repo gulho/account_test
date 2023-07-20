@@ -6,9 +6,10 @@ services:
       POSTGRES_PASSWORD: "password"
       POSTGRES_USER: "user"
       POSTGRES_DB: "account"
-#    ports:
-#      - "5432:5432"
   service:
-    image: "account:1.0.0"
+    depends_on:
+      - db
+    build:
+      dockerfile: Dockerfile-app
     ports:
       - "8080:8080"
